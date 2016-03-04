@@ -6,7 +6,6 @@ var url = require('url');
 var minimist = require('minimist');
 var argv;
 var port = 3000;
-var host = '127.0.0.1';
 var slackToken;
 var groupRestrict;
 var slackHost;
@@ -15,7 +14,7 @@ function rollDie(max){
   return Math.floor(Math.random() * (max - 1 + 1)) + 1;
 }
 
-function startRollServer(port, ip, slackToken, slackHost, groupRestrict){
+function startRollServer(port, slackToken, slackHost, groupRestrict){
   var server = http.createServer(function(req, res){
     var parsed = url.parse(req.url, true);
     
@@ -78,21 +77,20 @@ function startRollServer(port, ip, slackToken, slackHost, groupRestrict){
       res.end('nope');
     }
   });
-  server.listen(port, ip);
-  console.log('listening on', ip+':'+port)
+  server.listen(port);
+  console.log('listening on: ' + port)
 }
 
 if(!module.parent){
   argv = minimist(process.argv.slice(2));
-  host = argv.host || host;
-  port = argv.port || port;
-  groupRestrict = argv.group || groupRestrict;
-  slackHost = argv.slack || slackHost;
-  slackToken = argv.token || slackToken;
+  port = process.env.PORT || argv.port || port;
+  groupRestrict = process.env.SLACK_GROUP || argv.group || groupRestrict;
+  slackHost = process.env.SLACK_HOST || argv.slack || slackHost;
+  slackToken = process.env.SLACK_TOKEN || argv.token || slackToken;
 
   if(typeof slackToken === 'undefined' || typeof slackHost === 'undefined'){
     console.log('You need a slack token and a slack hostname to continue');
   }
 
-  startRollServer(port, host, slackToken, slackHost, groupRestrict);
+  startRollServer(port, slackToken, slackHost, groupRestrict);
 }
