@@ -13,7 +13,7 @@ function rollDie(max){
   return random.integer(1, max);
 }
 
-function startRollServer(port, slackToken, groupRestrict){
+function startRollServer(port, slackToken){
   let server = http.createServer(function(req, res){
     let parsed = url.parse(req.url, true);
     if (slackToken !== parsed.query.token) {
@@ -75,5 +75,5 @@ if(!module.parent){
     console.log('You need a slack token and a slack hostname to continue');
   }
 
-  startRollServer(port, slackToken, groupRestrict);
+  startRollServer(port, slackToken);
 }
