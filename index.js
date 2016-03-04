@@ -1,22 +1,22 @@
 'use strict';
 
-var http = require('http');
-var https = require('https');
-var url = require('url');
-var minimist = require('minimist');
-var argv;
-var port = 3000;
-var slackToken;
-var groupRestrict;
-var random = require("random-js")();
+let http = require('http');
+let https = require('https');
+let url = require('url');
+let minimist = require('minimist');
+let argv;
+let port = 3000;
+let slackToken;
+let groupRestrict;
+let random = require("random-js")();
 
 function rollDie(max){
   return random.integer(1, max);
 }
 
 function startRollServer(port, slackToken, groupRestrict){
-  var server = http.createServer(function(req, res){
-    var parsed = url.parse(req.url, true);
+  let server = http.createServer(function(req, res){
+    let parsed = url.parse(req.url, true);
     if (slackToken !== parsed.query.token) {
       console.log("Invalid verification token");
       return res.end('');
@@ -27,38 +27,43 @@ function startRollServer(port, slackToken, groupRestrict){
     }
 
     if(parsed.pathname === '/roll'){
-      var diceData = parsed.query.text.split('d');
-      var echoChannel = parsed.query.channel_id;
-      var numDice = parseInt(diceData[0] || 1, 10);
-      var diceType = parseInt(diceData[1], 10);
-      var results = [];
-      var roll = 0;
-
+      let diceData = parsed.query.text.split('d');
+      let echoChannel = parsed.query.channel_id;
+      let numDice = parseInt(diceData[0] || 1, 10);
+      let diceType = parseInt(diceData[1], 10);
+      let results = [];
+      let roll = 0;
+      let output;
       console.log('request', req.url);
 
-      if(!isNaN(numDice) && !isNaN(diceType)){
+      if(!isNaN(numDice) && !isNaN(diceType) && numDice > 0 && diceType > 1){
         console.log('valid request, rolling dice');
         numDice = numDice > 10 ? 10 : numDice;
         diceType = diceType > 100 ? 100 : diceType;
-        for(var i = 0; i < numDice; i++){
+        for(let i = 0; i < numDice; i++){
           roll = rollDie(diceType);
           results.push(roll);
         }
+
+        let total = results.reduce(function(a,r){ return a += r}, 0);
+
+        output = JSON.stringify({
+          text: parsed.query.user_name + " rolled " + 
+          diceData.join('d')+ ' for ' +
+          total + (numDice > 1 ? ' (' + results.join(', ') + ')' : ''),
+          response_type: 'in_channel'
+        });
+      } else {
+        output = JSON.stringify({
+          text: 'do you think this a game???',
+          response_type: 'ephemeral'
+        })
       }
-
-      var total = results.reduce(function(a,r){ return a += r}, 0);
-
-      var output = JSON.stringify({
-        text: parsed.query.user_name + " rolled " + 
-        diceData.join('d')+ ' for ' 
-        + total + (numDice > 1 ? ' (' + results.join(', ') + ')' : ''),
-        response_type: 'ephemeral'
-      });
 
       console.log('sending to webhook', output);
       
-      var responseUrl = url.parse(parsed.query.response_url);
-      var post = https.request({
+      let responseUrl = url.parse(parsed.query.response_url);
+      let post = https.request({
         host: responseUrl.host,
         path: responseUrl.path,
         method: 'POST',
