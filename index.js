@@ -77,8 +77,8 @@ function startRollServer(port, slackToken, groupRestrict){
           console.log('response', chunk);
         });
       });
-
-      post.write(output);
+      res.setEncoding('application/json');
+      res.write(output);
       post.end();
 
       res.end('');
