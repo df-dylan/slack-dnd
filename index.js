@@ -38,7 +38,7 @@ function startRollServer(port, slackToken, groupRestrict){
       if(!isNaN(numDice) && !isNaN(diceType)){
         console.log('valid request, rolling dice');
         numDice = numDice > 10 ? 10 : numDice;
-        diceType = diceType > 20 ? 20 : diceType;
+        diceType = diceType > 100 ? 100 : diceType;
         for(var i = 0; i < numDice; i++){
           roll = rollDie(diceType);
           results.push(roll);
@@ -48,7 +48,9 @@ function startRollServer(port, slackToken, groupRestrict){
       var total = results.reduce(function(a,r){ return a += r}, 0);
 
       var output = JSON.stringify({
-        text: diceData.join('d')+': '+total+'; '+results.join(' '),
+        text: parsed.query.user_name + " rolled " + 
+        diceData.join('d')+ ' for ' 
+        + total + (numDice > 1 ? ' (' + results.join(', ') + ')' : ''),
         response_type: 'ephemeral'
       });
 
