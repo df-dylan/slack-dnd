@@ -8,16 +8,19 @@ var argv;
 var port = 3000;
 var slackToken;
 var groupRestrict;
-var slackHost;
 
 function rollDie(max){
   return Math.floor(Math.random() * (max - 1 + 1)) + 1;
 }
 
-function startRollServer(port, slackToken, slackHost, groupRestrict){
+function startRollServer(port, slackToken, groupRestrict){
   var server = http.createServer(function(req, res){
     var parsed = url.parse(req.url, true);
-    
+    if (slackToken !== parsed.query.token) {
+      console.log("Invalid verification token");
+      return res.end('');
+    } 
+
     if(typeof groupRestrict !== 'undefined'  && parsed.query.team_id !== groupRestrict){
       return res.end('');
     }
@@ -46,16 +49,15 @@ function startRollServer(port, slackToken, slackHost, groupRestrict){
 
       var output = JSON.stringify({
         text: diceData.join('d')+': '+total+'; '+results.join(' '),
-        username: 'dungeonmaster',
-        icon_emoji: ':dm:',
-        channel: echoChannel
+        response_type: 'ephemeral'
       });
 
       console.log('sending to webhook', output);
       
+      var responseUrl = url.parse(parsed.query.response_url);
       var post = https.request({
-        host: slackHost,
-        path: '/services/hooks/incoming-webhook?token='+slackToken,
+        host: responseUrl.host,
+        path: responseUrl.path,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -85,12 +87,11 @@ if(!module.parent){
   argv = minimist(process.argv.slice(2));
   port = process.env.PORT || argv.port || port;
   groupRestrict = process.env.SLACK_GROUP || argv.group || groupRestrict;
-  slackHost = process.env.SLACK_HOST || argv.slack || slackHost;
   slackToken = process.env.SLACK_TOKEN || argv.token || slackToken;
 
-  if(typeof slackToken === 'undefined' || typeof slackHost === 'undefined'){
+  if(typeof slackToken === 'undefined'){
     console.log('You need a slack token and a slack hostname to continue');
   }
 
-  startRollServer(port, slackToken, slackHost, groupRestrict);
+  startRollServer(port, slackToken, groupRestrict);
 }
