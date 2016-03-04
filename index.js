@@ -7,7 +7,6 @@ let minimist = require('minimist');
 let argv;
 let port = 3000;
 let slackToken;
-let groupRestrict;
 let random = require("random-js")();
 
 function rollDie(max){
@@ -20,10 +19,6 @@ function startRollServer(port, slackToken, groupRestrict){
     if (slackToken !== parsed.query.token) {
       console.log("Invalid verification token");
       return res.end('');
-    } 
-
-    if(typeof groupRestrict !== 'undefined'  && parsed.query.team_id !== groupRestrict){
-      return res.end('');
     }
 
     if(parsed.pathname === '/roll'){
@@ -34,9 +29,9 @@ function startRollServer(port, slackToken, groupRestrict){
       let results = [];
       let roll = 0;
       let output;
-      console.log('request', req.url);
 
-      if(!isNaN(numDice) && !isNaN(diceType) && numDice > 0 && diceType > 1){
+      if(!isNaN(numDice) && !isNaN(diceType) 
+        && numDice > 0 && diceType > 1 && diceData.length === 2){
         console.log('valid request, rolling dice');
         numDice = numDice > 10 ? 10 : numDice;
         diceType = diceType > 100 ? 100 : diceType;
@@ -44,7 +39,6 @@ function startRollServer(port, slackToken, groupRestrict){
           roll = rollDie(diceType);
           results.push(roll);
         }
-
         let total = results.reduce(function(a,r){ return a += r}, 0);
 
         output = JSON.stringify({
@@ -75,7 +69,6 @@ function startRollServer(port, slackToken, groupRestrict){
 if(!module.parent){
   argv = minimist(process.argv.slice(2));
   port = process.env.PORT || argv.port || port;
-  groupRestrict = process.env.SLACK_GROUP || argv.group || groupRestrict;
   slackToken = process.env.SLACK_TOKEN || argv.token || slackToken;
 
   if(typeof slackToken === 'undefined'){
