@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:toddself/slack-dnd"
+    "url": "git@github.com:df-dylan/slack-dnd"
   },
   "bin": {
     "slack-dnd": "index.js"
@@ -32,14 +32,15 @@
     "role",
     "playing"
   ],
-  "author": "Todd Kennedy <todd@selfassembled.org>",
+  "author": "Dylan Sackmann <dylan@digitalfoundry.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/toddself/slack-dnd/issues"
+    "url": "https://github.com/df-dylan/slack-dnd/issues"
   },
-  "homepage": "https://github.com/toddself/slack-dnd",
+  "homepage": "https://github.com/df-dylan/slack-dnd",
   "dependencies": {
     "minimist": "^0.1.0",
+    "random-js": "^1.0.8",
     "tap": "^0.4.11"
   }
 }

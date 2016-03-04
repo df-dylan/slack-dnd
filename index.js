@@ -8,9 +8,10 @@ var argv;
 var port = 3000;
 var slackToken;
 var groupRestrict;
+var random = require("random-js")();
 
 function rollDie(max){
-  return Math.floor(Math.random() * (max - 1 + 1)) + 1;
+  return random.integer(1, max);
 }
 
 function startRollServer(port, slackToken, groupRestrict){
