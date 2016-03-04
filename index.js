@@ -61,28 +61,9 @@ function startRollServer(port, slackToken, groupRestrict){
       }
 
       console.log('sending to webhook', output);
-      
-      let responseUrl = url.parse(parsed.query.response_url);
-      let post = https.request({
-        host: responseUrl.host,
-        path: responseUrl.path,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': output.length
-        }
-      }, function(res){
-        res.setEncoding('utf8');
-        res.on('data', function(chunk){
-          console.log('response', chunk);
-        });
-      });
-      res.setEncoding('application/json');
+            
       res.write(output);
-      post.end();
-
       res.end('');
-
     } else {
       res.end('nope');
     }
