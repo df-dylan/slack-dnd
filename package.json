@@ -4,14 +4,15 @@
   "description": "A slack integration for assisting in playing d&d",
   "main": "index.js",
   "scripts": {
-    "test": "tap test/*js"
+    "test": "tap test/*js",
+    "start": "index.js"
   },
   "repository": {
     "type": "git",
     "url": "git@github.com:toddself/slack-dnd"
   },
   "bin": {
-    "start": "index.js"
+    "slack-dnd": "index.js"
   },
   "keywords": [
     "dnd",
