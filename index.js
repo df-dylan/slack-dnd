@@ -61,7 +61,7 @@ function startRollServer(port, slackToken, groupRestrict){
       }
 
       console.log('sending to webhook', output);
-            
+      res.writeHead(200, {'Content-Type': 'application/json'})
       res.write(output);
       res.end('');
     } else {
